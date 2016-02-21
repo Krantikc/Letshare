@@ -2,12 +2,19 @@ package com.letshare.model;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.ws.rs.FormParam;
+
 
 /**
  * Post model class, which is persistence object for 'post' table
@@ -29,35 +36,58 @@ public class Post {
 	@Column(name="description")
 	private String description;
 	
-	@Column(name="main_category_id")
-	private int mainCategoryId;
-	
-	@Column(name="sub_category_id")
-	private int subCategoryId;
+	@Column(name="category_id")
+	private int categoryId;
 	
 	@Column(name="post_location_id")
 	private int postLocationId;
 	
+	@OneToOne(cascade = CascadeType.ALL)
+	private PostLocation postLocation;
+	
 	@Column(name="user_id")
 	private int userId;
 	
-	@Column(name="post_details_id")
-	private int postDetailsId;
+	@OneToOne(cascade = CascadeType.ALL)
+	private PostDetails postDetails;
 	
 	@Column(name="verification_code")
 	private String verificationCode;
 	
 	@Column(name="active")
-	private String active;
+	private boolean active;
 	
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="posted_date")
 	private Date postedDate;
 	
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="modified_date")
 	private Date modifiedDate;
 
 	public Post() {
 		
+	}
+
+	public Post(String title,
+			   	String description,
+			   	int categoryId,
+			   	int userId,
+			   	PostLocation postLocation,
+			   	PostDetails postDetails,
+			   	Date postedDate,
+			   	Date modifiedDate,
+			   	boolean active
+			   	) {
+		this.title = title;
+		this.description = description;
+		this.categoryId = categoryId;
+		this.userId = userId;
+		this.postLocation = postLocation;
+		this.postDetails = postDetails;
+		this.postedDate = postedDate;
+		this.modifiedDate = modifiedDate;
+		this.active = active;
 	}
 	
 	public Post(String title, String description) {
@@ -88,20 +118,12 @@ public class Post {
 		this.description = description;
 	}
 
-	public int getMainCategoryId() {
-		return mainCategoryId;
+	public int getCategoryId() {
+		return categoryId;
 	}
 
-	public void setMainCategoryId(int mainCategoryId) {
-		this.mainCategoryId = mainCategoryId;
-	}
-
-	public int getSubCategoryId() {
-		return subCategoryId;
-	}
-
-	public void setSubCategoryId(int subCategoryId) {
-		this.subCategoryId = subCategoryId;
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
 	}
 
 	public int getPostLocationId() {
@@ -120,13 +142,6 @@ public class Post {
 		this.userId = userId;
 	}
 
-	public int getPostDetailsId() {
-		return postDetailsId;
-	}
-
-	public void setPostDetailsId(int postDetailsId) {
-		this.postDetailsId = postDetailsId;
-	}
 
 	public String getVerificationCode() {
 		return verificationCode;
@@ -136,11 +151,11 @@ public class Post {
 		this.verificationCode = verificationCode;
 	}
 
-	public String getActive() {
+	public boolean getActive() {
 		return active;
 	}
 
-	public void setActive(String active) {
+	public void setActive(boolean active) {
 		this.active = active;
 	}
 
@@ -158,6 +173,22 @@ public class Post {
 
 	public void setModifiedDate(Date modifiedDate) {
 		this.modifiedDate = modifiedDate;
+	}
+
+	public PostLocation getPostLocation() {
+		return postLocation;
+	}
+
+	public void setPostLocation(PostLocation postLocation) {
+		this.postLocation = postLocation;
+	}
+
+	public PostDetails getPostDetails() {
+		return postDetails;
+	}
+
+	public void setPostDetails(PostDetails postDetails) {
+		this.postDetails = postDetails;
 	}
 	
 	

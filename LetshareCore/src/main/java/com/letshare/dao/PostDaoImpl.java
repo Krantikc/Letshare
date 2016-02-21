@@ -2,8 +2,11 @@ package com.letshare.dao;
 
 import java.util.List;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.classic.Session;
+import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import com.letshare.model.Post;
 import com.letshare.util.HibernateUtil;
@@ -13,8 +16,11 @@ import com.letshare.util.HibernateUtil;
  * @author Kranti K C
  * Implements PostDao, hence all the abstract methods related to Post are implemented 
  */
+@Repository("postDao")
 public class PostDaoImpl implements PostDao{
-	static SessionFactory sessionFactory = HibernateUtil.getSessionFactory(); // Singleton instance of Session Factory
+	
+
+	SessionFactory sessionFactory = HibernateUtil.getSessionFactory(); // Singleton instance of Session Factory
 
 	/**
 	 * Adds new post from post obj
@@ -53,6 +59,18 @@ public class PostDaoImpl implements PostDao{
 		session.getTransaction().commit();
 		session.close();
 		return postsList;
+	}
+
+	@Override
+	public Post getPost(int postId) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		Post post = (Post) session.createCriteria(Post.class)
+							.add(Restrictions.eq("postId", postId))
+						    .uniqueResult();
+		session.getTransaction().commit();
+		session.close();
+		return post;
 	}
 	
 }
