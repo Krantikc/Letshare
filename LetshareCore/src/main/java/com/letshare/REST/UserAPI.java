@@ -27,7 +27,6 @@ import com.letshare.services.UserService;
 public class UserAPI {
 
 	@Autowired
-	@Qualifier("userService")
 	UserService userService;
 	
 	@GET
@@ -52,6 +51,7 @@ public class UserAPI {
 			}
 			return Response.ok(response).build();
 		} catch(Exception e) {
+			e.printStackTrace();
 			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
 		

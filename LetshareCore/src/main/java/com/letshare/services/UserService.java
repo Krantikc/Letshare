@@ -1,6 +1,9 @@
 package com.letshare.services;
 
+import org.springframework.stereotype.Service;
+
 import com.letshare.model.User;
+
 
 public interface UserService {
 

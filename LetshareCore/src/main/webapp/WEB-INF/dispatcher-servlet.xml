@@ -13,8 +13,7 @@
 
   <tx:annotation-driven />
   
-  <context:component-scan 
-    base-package="com.letshare.dao" />
+  <context:component-scan base-package="com.letshare.*" />
 
 	<context:annotation-config />
 	<context:spring-configured/>
@@ -38,8 +37,7 @@
     </property>
     <property name="packagesToScan" value="com.letshare.model" />
   </bean>
-  
-  <bean id="postService" class="com.letshare.services.PostServiceImpl"></bean>
+
   <bean id="transactionManager"
     class="org.springframework.orm.hibernate4.HibernateTransactionManager" 
     p:sessionFactory-ref="sessionFactory">

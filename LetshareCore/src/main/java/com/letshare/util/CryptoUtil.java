@@ -63,7 +63,7 @@ public class CryptoUtil {
     {
     	CryptoUtil td= new CryptoUtil();
 
-        String target="password";
+        String target="kra";
         String encrypted=td.encrypt(target);
         String decrypted=td.decrypt(encrypted);
 
