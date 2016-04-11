@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.FormParam;
@@ -20,7 +21,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
@@ -30,12 +33,14 @@ import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.letshare.dao.PostDaoImpl;
 import com.letshare.model.Post;
 import com.letshare.model.PostDetails;
 import com.letshare.model.PostLocation;
 import com.letshare.services.PostService;
+import com.letshare.util.FileUtil;
 
 /**
  * Webservice for CRUD operations related to Post. 
@@ -90,38 +95,63 @@ public class PostAPI {
 	}
 	
 	@POST
-    @Produces("application/json")
-	public Response addPost(@FormParam("title") String title,
-									   @FormParam("description") String description,
-									   @FormParam("categoryId") int categoryId,
-									   @FormParam("userId") int userId,
-									   // Location Details
-									   @FormParam("location1Id") int location1Id,
-									   @FormParam("city1Id") int city1Id,
-									   @FormParam("location2Id") int location2Id,
-									   @FormParam("city2Id") int city2Id,
-									   @FormParam("location3Id") int location3Id,
-									   @FormParam("city3Id") int city3Id,
-									   // Post Details
-									   @FormParam("uniqueId") String uniqueId,
-									   @FormParam("color") String color,
-									   @FormParam("measurement") String measurement,
-									   @FormParam("capacity") int capacity,
-									   @FormParam("availability") int availability,
-									   @FormParam("amenities") String amenities,
-									   @FormParam("brand") String brand,
-									   @FormParam("age") String age
-									   ) {
+    //@Produces("application/json")
+	@Consumes("multipart/form-data")
+	public Response addPost(@FormDataParam("title") String title,
+							@FormDataParam("description") String description,
+							//@FormDataParam("categoryId") int categoryId,
+							//@FormDataParam("userId") int userId,
+										   // Location Details
+							@FormDataParam("location1Id") int location1Id,
+							@FormDataParam("city1Id") int city1Id,
+							@FormDataParam("location2Id") int location2Id,
+							@FormDataParam("city2Id") int city2Id,
+							@FormDataParam("location3Id") int location3Id,
+							@FormDataParam("city3Id") int city3Id,
+										   // Post Details
+							@FormDataParam("uniqueId") String uniqueId,
+							//@FormDataParam("color") String color,
+							//@FormDataParam("measurement") String measurement,
+							@FormDataParam("capacity") int capacity,
+							@FormDataParam("availability") int availability,
+							@FormDataParam("amenities") String amenities,
+							@FormDataParam("brand") String brand,
+							@FormDataParam("age") String age,
+						    // Images uploaded
+						    @FormDataParam("uploadedFile1") InputStream uploadedInputStream1,
+						    @FormDataParam("uploadedFile1") FormDataContentDisposition fileMetaData1,
+
+						    @FormDataParam("uploadedFile2") InputStream uploadedInputStream2,
+						    @FormDataParam("uploadedFile2") FormDataContentDisposition fileMetaData2,
+
+						    @FormDataParam("uploadedFile3") InputStream uploadedInputStream3,
+						    @FormDataParam("uploadedFile3") FormDataContentDisposition fileMetaData3,
+						    @Context HttpServletRequest request) {
 		
 		Map<String, Object> response = new HashMap<String, Object>();
 		//List<Post> posts = postService.getAllPosts();
 		try {
 			PostLocation postLocation = new PostLocation(location1Id, city1Id, location2Id, city2Id, location3Id, city3Id);
-			PostDetails postDetails = new PostDetails(uniqueId, color, measurement, capacity, availability, amenities, brand, age);
+			PostDetails postDetails = new PostDetails(uniqueId, "", "", capacity, availability, amenities, brand, age);
 					
-			Post post = new Post(title, description, categoryId, userId, postLocation, postDetails, new Date(), new Date(), true);
+			Post post = new Post(title, description, 1, 1, postLocation, postDetails, new Date(), new Date(), true);
 
+			
 			int postId = postService.addPost(post);
+			
+			String folderName = "posts" + File.separator + postId;
+			
+			if (postId != 0) {
+				String uploadedPath = "";
+				
+				FileUtil.uploadFile(request, uploadedInputStream1,  folderName, fileMetaData1.getFileName());
+				FileUtil.uploadFile(request, uploadedInputStream2,  folderName, fileMetaData2.getFileName());
+				uploadedPath = FileUtil.uploadFile(request, uploadedInputStream3,  folderName, fileMetaData3.getFileName());
+				response.put("filePath", uploadedPath);	
+			}
+			
+			
+			
 			response.put("success", true);			
             return Response.ok(response).build();
 
@@ -135,93 +165,20 @@ public class PostAPI {
 	@Path("/upload")
 	@Consumes("multipart/form-data")
 	public Response uploadFile(@FormDataParam("uploadedFile") InputStream uploadedInputStream,
-							   @FormDataParam("uploadedFile") FormDataContentDisposition fileMetaData) throws IOException {
-		System.out.println("Uploading..");
+							   @FormDataParam("uploadedFile") FormDataContentDisposition fileMetaData,
+							   @FormDataParam("name") String name,
+							   @Context HttpServletRequest request) throws IOException {
+		System.out.println("Uploading.." + name);
 		String fileName = "";
-		System.out.println(uploadedInputStream.read());
+		//System.out.println(uploadedInputStream.read());
 		fileName = fileMetaData.getFileName();
 		
-		writeToFile(uploadedInputStream, UPLOADED_FILE_PATH + fileName);
+		String uploadedPath = FileUtil.uploadFile(request, uploadedInputStream,  "img", fileName);
 		
-		/*
-		Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
-		List<InputPart> inputParts = uploadForm.get("uploadedFile");
-
-		for (InputPart inputPart : inputParts) {
-
-		 try {
-
-			MultivaluedMap<String, String> header = inputPart.getHeaders();
-			fileName = getFileName(header);
-
-			//convert the uploaded file to inputstream
-			InputStream inputStream = inputPart.getBody(InputStream.class,null);
-
-			byte [] bytes = IOUtils.toByteArray(inputStream);
-				
-			//constructs upload file path
-			fileName = UPLOADED_FILE_PATH + fileName;
-				
-			writeFile(bytes,fileName);
-				
-			System.out.println("Done");
-
-		  } catch (IOException e) {
-			e.printStackTrace();
-		  }
-
-		}
-*/
 		return Response.status(200)
-		    .entity("uploadFile is called, Uploaded file name : " + fileName).build();   
+		    .entity(uploadedPath).build();   
 		
 	}
 	
-	/**
-	 * header sample
-	 * {
-	 * 	Content-Type=[image/png], 
-	 * 	Content-Disposition=[form-data; name="file"; filename="filename.extension"]
-	 * }
-	 **/
-	//get uploaded filename, is there a easy way in RESTEasy?
-	private String getFileName(MultivaluedMap<String, String> header) {
-
-		String[] contentDisposition = header.getFirst("Content-Disposition").split(";");
-		
-		for (String filename : contentDisposition) {
-			if ((filename.trim().startsWith("filename"))) {
-
-				String[] name = filename.split("=");
-				
-				String finalFileName = name[1].trim().replaceAll("\"", "");
-				return finalFileName;
-			}
-		}
-		return "unknown";
-	}
-
-	//save to somewhere
-	private void writeToFile(InputStream uploadedInputStream,
-	        String uploadedFileLocation) {
-
-	    try {
-	        OutputStream out = new FileOutputStream(new File(
-	                uploadedFileLocation));
-	        int read = 0;
-	        byte[] bytes = new byte[1024];
-
-	        out = new FileOutputStream(new File(uploadedFileLocation));
-	        while ((read = uploadedInputStream.read(bytes)) != -1) {
-	            out.write(bytes, 0, read);
-	        }
-	        out.flush();
-	        out.close();
-	    } catch (IOException e) {
-
-	        e.printStackTrace();
-	    }
-
-	   }
 	
 }

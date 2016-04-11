@@ -28,6 +28,9 @@
 	 <mapping class="com.letshare.model.PostDetails" />
 	 <mapping class="com.letshare.model.PostLocation" />
 	 <mapping class="com.letshare.model.Category" />
+	 
+	 <mapping class="com.letshare.model.City" />
+	 <mapping class="com.letshare.model.Location" />
 
 	</session-factory>
 </hibernate-configuration>
