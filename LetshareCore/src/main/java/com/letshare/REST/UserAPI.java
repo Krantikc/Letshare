@@ -1,8 +1,11 @@
 package com.letshare.REST;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -15,6 +18,9 @@ import org.springframework.stereotype.Component;
 
 import com.letshare.model.User;
 import com.letshare.services.UserService;
+import com.letshare.util.JWTokenUtil;
+
+import io.jsonwebtoken.Jwts;
 
 /**
  * Webservice for User Authentication. 
@@ -46,6 +52,8 @@ public class UserAPI {
 			if (user != null) {
 				response.put("success", true);
 				response.put("user", user);
+				
+				response.put("token", user.getAuthorizationToken());
 			} else {
 				response.put("success", false);
 			}
@@ -58,18 +66,45 @@ public class UserAPI {
 	}
 	
 	@POST
-	public Response addUser() {
-		User user = new User();
+	@Path("/validatesession")
+	@Consumes("application/json")
+	public Response authenticateUser(User user) {
+		
+		Map<String, Object> response = new HashMap<>();
+
 		try {
-			Map<String, Object> response = new HashMap<>();
-			int userId = userService.addUser(user);
-			
+			System.out.println(user.getAuthorizationToken());
+			response = userService.validateUserSession(user);
 			response.put("success", true);
-			response.put("userId", userId);
-			return Response.ok(response).build();
 		} catch(Exception e) {
-			return Response.status(Response.Status.UNAUTHORIZED).build();
+			
+			response.put("success", false);
+			e.printStackTrace();
 		}
+		return Response.ok(response).build();
+		
+	}
+	
+	@POST
+	@Consumes("application/json")
+	public Response addUser(User user) {
+		//User user = new User();
+		Map<String, Object> response = new HashMap<>();
+		try {
+			
+			response = userService.addUser(user);
+			
+			//response.put("success", true);
+			//response.put("userId", userId);
+			
+		} catch(Exception e) {
+			response.put("success", false);
+			response.put("exception", e.getClass());
+			response.put("message", e.getMessage());
+			e.printStackTrace();
+			//return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
+		return Response.ok(response).build();
 		
 	}
 }

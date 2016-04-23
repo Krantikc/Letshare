@@ -13,10 +13,16 @@ public interface UserDAO {
 	
 	public User getUserByUserId(int userId);
 	
+	public User getUserByToken(String token);
+	
 	public int createUser(User user);
 	
 	public boolean updateUser(User user);
 	
 	public boolean deleteUser(User user);
+	
+	public User findUserByEmail(String email)  throws Exception;
+	
+	public User findUserByMobile(String mobile)  throws Exception;
 	
 }

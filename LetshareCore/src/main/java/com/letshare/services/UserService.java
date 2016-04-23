@@ -1,5 +1,8 @@
 package com.letshare.services;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 
 import com.letshare.model.User;
@@ -7,11 +10,15 @@ import com.letshare.model.User;
 
 public interface UserService {
 
-	public User authenticateUser(String email, String password);
+	public User authenticateUser(String email, String password)  throws Exception;
 	
-	public int addUser(User user);
+	public Map<String, Object> validateToken(String token, User user);
 	
-	public boolean updateUser(User user);
+	public Map<String, Object> validateUserSession(User user);
 	
-	public boolean deleteUser(User user);
+	public Map<String, Object>  addUser(User user)  throws Exception;
+	
+	public boolean updateUser(User user)  throws Exception;
+	
+	public boolean deleteUser(User user)  throws Exception;
 }

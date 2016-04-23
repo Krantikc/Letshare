@@ -10,6 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * 
  * @author Kranti K C
@@ -17,6 +19,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="user")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
 
 	@Id
@@ -63,10 +66,22 @@ public class User {
 	@Column(name="authorization_token")
 	private String authorizationToken;
 	
+	@Column(name="token_issued_at")
+	private Date tokenIssuedAt;
+	
 	// setters and getters
+
 
 	public int getUserId() {
 		return userId;
+	}
+
+	public Date getTokenIssuedAt() {
+		return tokenIssuedAt;
+	}
+
+	public void setTokenIssuedAt(Date tokenIssuedAt) {
+		this.tokenIssuedAt = tokenIssuedAt;
 	}
 
 	public void setUserId(int userId) {
@@ -167,6 +182,14 @@ public class User {
 
 	public void setActivationCode(String activationCode) {
 		this.activationCode = activationCode;
+	}
+
+	public String getAuthorizationToken() {
+		return authorizationToken;
+	}
+
+	public void setAuthorizationToken(String authorizationToken) {
+		this.authorizationToken = authorizationToken;
 	}
 
 }

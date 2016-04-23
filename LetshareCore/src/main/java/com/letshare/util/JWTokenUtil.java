@@ -12,9 +12,10 @@ import io.jsonwebtoken.impl.crypto.MacProvider;
 
 public class JWTokenUtil {
 
-	static final Key SECURITY_KEY = MacProvider.generateKey();
+	public static final String SECRET_KEY = "LetshareWithOurNewWorldz";
+	public static final Key SECURITY_KEY = MacProvider.generateKey();
 	static final int TOKEN_EXPIRY_TIME = (5 * 60 * 1000); // 5 Minutes
-	public String generateTokenByEmail(String email) {
+	public static String generateTokenByEmail(String email) {
 		
 		Claims claims = Jwts.claims();
 		claims.setSubject(email);
@@ -25,28 +26,29 @@ public class JWTokenUtil {
 		
 		String authToken = Jwts.builder()
 					   .setClaims(claims)
-					   .signWith(SignatureAlgorithm.HS512, SECURITY_KEY)
+					   .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
 					   .compact();
 		
 		return authToken;
 		
 	}
 	
-	public boolean validateToken(String authToken, String email) {
-		
-		Claims claims = Jwts.parser()
-							.setSigningKey(SECURITY_KEY)
-							.parseClaimsJws(authToken).getBody();
-
+	public static boolean validateToken(String authToken, String email) throws ExpiredJwtException{
 		boolean isValid = false;
-		try {
-			isValid = claims.getSubject().equals(email);
-		} catch (ExpiredJwtException e) {
-
-			String s = generateTokenByEmail(email);
-			System.out.println("Expired, but regenerated");
-		}
-		return false;
+		Claims claims = Jwts.parser()
+						.setSigningKey(SECRET_KEY)
+						.parseClaimsJws(authToken).getBody();
+		isValid = claims.getSubject().equals(email);
+		
+		return isValid;
+	}
+	
+	public static Date getTokenExpiry(String authToken) throws ExpiredJwtException {
+		
+		Date tokenExpiry = Jwts
+							.parser().setSigningKey(SECRET_KEY).parseClaimsJws(authToken).getBody().getIssuedAt();
+		
+		return tokenExpiry;
 	}
 	public static void main(String[] args) {
 		

@@ -44,8 +44,12 @@ private SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 
 	@Override
 	public boolean updateUser(User user) {
-		// TODO Auto-generated method stub
-		return false;
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		session.saveOrUpdate(user);
+		session.getTransaction().commit();
+		session.close();
+		return true;
 	}
 
 	@Override
@@ -53,5 +57,42 @@ private SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public User findUserByEmail(String email) throws Exception{
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		User user = (User) session.createCriteria(User.class)
+												 .add(Restrictions.eq("email", email))
+												 .uniqueResult();
+		session.getTransaction().commit();
+		session.close();
+		return user;
+	}
+	
+	@Override
+	public User findUserByMobile(String mobile) throws Exception{
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		User user = (User) session.createCriteria(User.class)
+												 .add(Restrictions.eq("mobile", mobile))
+												 .uniqueResult();
+		session.getTransaction().commit();
+		session.close();
+		return user;
+	}
+
+	@Override
+	public User getUserByToken(String token) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		User user = (User) session.createCriteria(User.class)
+												 .add(Restrictions.eq("authorizationToken", token))
+												 .uniqueResult();
+		session.getTransaction().commit();
+		session.close();
+		return user;
+	}
+
 
 }
