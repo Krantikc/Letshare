@@ -16,6 +16,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -36,11 +37,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.letshare.dao.PostDaoImpl;
+import com.letshare.dao.UserDAO;
 import com.letshare.model.Post;
 import com.letshare.model.PostDetails;
 import com.letshare.model.PostLocation;
+import com.letshare.model.User;
 import com.letshare.services.PostService;
+import com.letshare.services.UserService;
 import com.letshare.util.FileUtil;
+import com.letshare.util.JWTokenUtil;
+
+import io.jsonwebtoken.ExpiredJwtException;
 
 /**
  * Webservice for CRUD operations related to Post. 
@@ -56,6 +63,12 @@ public class PostAPI {
 	
 	@Autowired
 	PostService postService;
+	
+	@Autowired
+	UserDAO userDao;
+	
+	@Autowired
+	UserService userService;
 
 	@GET
 	@Path("/init")
@@ -65,14 +78,47 @@ public class PostAPI {
 	
 	@GET
     @Produces("application/json")
-	public Response getAllPosts(@QueryParam("title") String title, @CookieParam("auth_token") String authToken) {
+	public Response getAllPosts(@QueryParam("title") String title,
+			                    //@CookieParam("auth_token") String authToken,
+			                    @HeaderParam("Authorization") String token) {
+		
+		
+		
 		Map<String, Object> response = new HashMap<String, Object>();
-		System.out.println(authToken + " TOKEN ");
-		//try {
-			//List<Post> posts = postService.getAllPosts();
-			List<Post> posts = postService.getAllPosts();
-			response.put("posts", posts);		
-            return Response.ok(response).build();
+		String authToken = token.substring(7);
+		
+		User user = userDao.getUserByToken(authToken);
+		
+		boolean isValidAccess = false;
+		/*try {
+			isValidAccess = JWTokenUtil.validateToken(token.substring(7), user.getEmail());
+		} catch(ExpiredJwtException e) {
+			String regeneratedToken = JWTokenUtil.generateTokenByEmail(user.getEmail());
+			user.setAuthorizationToken(regeneratedToken);
+			userDao.updateUser(user);
+			response.put("token", regeneratedToken);
+			System.out.println("Regenerated Token");
+		}*/
+		
+		response = userService.validateToken(authToken, user);
+		if (response.get("valid") != null && (Boolean)response.get("valid")) {
+			isValidAccess = true;
+		}
+		
+		
+		if (isValidAccess) {
+			System.out.println(token + " TOKEN ");
+			//try {
+				//List<Post> posts = postService.getAllPosts();
+				List<Post> posts = postService.getAllPosts();
+				response.put("posts", posts);		
+				response.put("success", true);	
+		} else {
+			response.put("success", false);	
+			response.put("message", "Invalid user access");		
+		}
+		
+        return Response.ok(response).build();
 
        // } catch (Exception e) {
            // return Response.status(Response.Status.UNAUTHORIZED).build();
