@@ -7,6 +7,11 @@ import java.security.NoSuchAlgorithmException;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.util.Base64Utils;
 
+/**
+ * 
+ * @author Kranti
+ * Not Used in project
+ */
 public final class EncryptionService {
 
 	private static EncryptionService instance;
