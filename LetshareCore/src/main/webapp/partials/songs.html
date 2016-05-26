@@ -1,0 +1,44 @@
+<div id="gd-songs" fade-in>
+  <div id="songs-title" class="title"><h1>Bhakti Geetegalu</h1></div>
+  <div id="description">
+  <!--  
+  <audio controls>
+    <source src="audio/jeena.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+  </audio>
+  -->
+ <sound-manager></sound-manager>
+  <div class="songs-list">
+    <div class="song-block" ng-repeat="song in songs">
+        <div class="audio" music-player="play" add-song="song">{{ song.title }}</div>
+    </div>
+  </div>
+  
+  
+                
+ 
+
+ 
+  </div>
+  <div class="player">
+    <p>
+        Currently Playing: {{ currentPlaying.title }} by {{ currentPlaying.artist }} ({{ currentPostion }} / {{ currentDuration }})
+    </p>
+
+    <div class="seekBase" seek-track>
+        <div class="seekLoad" ng-style="{width : ( progress + '%' ) }"></div>
+    </div>
+    <div class="controls">
+      <div id="play" play-music title="Play"></div> 
+      <div id="pause" pause-music title="Pause"></div> 
+      <div id="stop" stop-music title="Stop"></div> 
+      <!--<div id="vol-down" music-volume data-type="decrease">-</div>
+      <div id="vol-fill" style="border-left:{{volume* (39/100)}}px solid transparent"></div>
+      <div id="vol"></div>
+      <div id="vol-up" music-volume data-type="increase">+</div> -->
+      
+    </div>
+  
+  </div>
+  
+</div>

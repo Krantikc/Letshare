@@ -1,0 +1,20 @@
+<div id="ls-posts-list" class="row">
+    <filter-box></filter-box>
+    <div class="col-md-8 centered list-box">
+      <div ng-if="postsList.length>0"
+           ui-sref="posts.details({id: post.postId})" 
+           ng-repeat="post in postsList"  
+           class="col-md-3 item">
+        <div class="img-block">
+          <img ng-src="imgs/monitor-page-background.png" onerror="this.src='imgs/no-image.png'"/>
+        </div>
+        <div class="details-block">
+          <div class="text-bold">{{post.title}}</div>
+        </div>
+      </div>
+        
+      <div class="col-md-8 centered text-center" ng-if="postsList.length==0">
+      No results found
+      </div>
+    </div>
+</div>

@@ -1,0 +1,74 @@
+<div id="gd-charitra" fade-in>
+  <div id="dealers-title" class="title"><h1>Sree Guru Charitra</h1></div>
+  <div id="description">
+     
+ 
+
+
+<p>Sree Guru Charitra was first written by Sree Gangadhara Sarawasthi in Marathi language. 
+The eminent scholar L.R. Pangarkar says that the first two incarnations of Lord Dattatreya, 
+Sree Sreepada Sreevallabha and Sree Nrisimha Saraswathi, the two protagonists of the immortal work, 
+had flourished in the 14th and 15th centuries A.D.</p>
+
+<p>The original text recount, in 53 chapters, the life and teachings 
+of the two incarnations in about 7000 verses. In the late nineteenth century, 
+Sree Vasudevananda Saraswathi, a famous saint of the Dattatreya tradition, 
+translated the work in Sanskrit verses of equal number.</p>
+
+<p>Later, he was told in a vision by Lord Dattatreya that 
+details pertaining to matters of Hindu religious ritual, 
+have infringed on proper theme of work, and was directed to abrdge it into 2000 verses.</p>
+
+ 
+<p>As a backdrop to the marvellous account of the avatars of Lord Dattatreya, 
+Sree Guru Charitra presents a comprehensive resume of the whole of ancient Indian philosophy in life.</p>
+ 
+<p>Sree Guru Charitra affirms the caste system of the Veda. 
+The assurance of Sree Guru that he would forever abide at Ganagapur and 
+go round the village for bhiksha at noon is literally true even today. 
+It is customary for devotees visiting the holy place to go for bhiksha.</p>
+ 
+<p>Identifying and contacting a Sadguru, a Perfect master, 
+is the crux of the problem of spiritual evolution of man, 
+both collective and individual, especially in the present times, 
+when the mass media and fanfare have made it more of a craze than a serious pursuit.</p>
+
+
+
+
+  
+  
+                
+ 
+
+ 
+  </div>
+  
+<sound-manager></sound-manager>
+  <div class="songs-list">
+    <div class="song-block" ng-repeat="song in songs">
+        <div class="audio" music-player="play" add-song="song">{{ song.title }}</div>
+    </div>
+  </div>
+  
+  <div class="player">
+    <p>
+        Currently Playing: {{ currentPlaying.title }} by {{ currentPlaying.artist }} ({{ currentPostion }} / {{ currentDuration }})
+    </p>
+
+    <div class="seekBase" seek-track>
+        <div class="seekLoad" ng-style="{width : ( progress + '%' ) }"></div>
+    </div>
+    <div class="controls">
+      <div id="play" play-music title="Play"></div> 
+      <div id="pause" pause-music title="Pause"></div> 
+      <div id="stop" stop-music title="Stop"></div> 
+      <!--<div id="vol-down" music-volume data-type="decrease">-</div>
+      <div id="vol-fill" style="border-left:{{volume* (39/100)}}px solid transparent"></div>
+      <div id="vol"></div>
+      <div id="vol-up" music-volume data-type="increase">+</div> -->
+      
+    </div>
+  
+  </div>
+</div>

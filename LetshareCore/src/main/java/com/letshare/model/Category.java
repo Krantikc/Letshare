@@ -32,6 +32,12 @@ public class Category {
 	@Column(name="parent_id")
 	private int parentId;
 	
+	@Column(name="img")
+	private String image;
+	
+	@Column(name="is_ride")
+	private boolean isRide;
+	
 	
 
 	public Category() {
@@ -74,6 +80,22 @@ public class Category {
 
 	public void setParentId(int parentId) {
 		this.parentId = parentId;
+	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
+	public boolean isRide() {
+		return isRide;
+	}
+
+	public void setRide(boolean isRide) {
+		this.isRide = isRide;
 	}
 	
 	

@@ -1,0 +1,47 @@
+<div class="col-md-8 centered filter-block">
+    <div class="col-md-3 area-selector" data-toggle="collapse" data-target="#demo">
+      <span class="city-name">{{selectedCity.name}}</span>
+      <div class="chevron">
+        <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+      </div>
+    </div>
+    <select class="col-md-3 type-selector" ng-model="selection.postType" ng-init="selection.postType = 'share'">
+      <option value="share">Share</option>
+      <option value="requirement">Requirement</option>
+    </select>
+    <div class="col-md-5 search-post">
+      <input ng-model="searchTitle" 
+             type="text" 
+             placeholder="Search here eg, Taxi, Bike, Tractor etc"/>
+    </div>
+    <div class="col-md-2 search-icon" ng-click="getPosts(selectedCity, 0, searchTitle)">
+      
+    </div>
+  </div>
+  <div class="col-md-8 centered area-selection-box collapse" id="demo">
+      <div class="col-md-8 search-box">
+          <angucomplete-alt 
+              id="ex1"
+              maxlength="50"
+              ng-click="onCitySelection()"
+              placeholder="Type your city name" 
+              pause="100"
+              selected-object="selection.city"
+              local-data="cities"
+              search-fields="name"
+              title-field="name"
+              minlength="1"
+              input-class="form-control form-control-small"
+              match-class="highlight"/>
+      </div>
+      <!--
+      <input type="text" ng-model="selected" typeahead="city.name for city in cities | filter:$viewValue | limitTo:8" class="form-control">
+      -->
+      <div class="col-md-8 popular-cities-block">
+        <div class="title">Popular cities</div>
+        <div class="col-md-3 popular-city" 
+             ng-repeat="city in cities"
+             ng-click="selectPopularCity(city)" >{{city.name}}</div>
+      </div>
+      
+  </div>

@@ -1,0 +1,31 @@
+<div id="gd-enquiry" ng-controller="EnquiryController">
+	<div id="enquiry-contents">
+	<div id="enquiry-form">
+		<form name="enquiryForm" ng-submit="submitForm(enquiryForm.$valid)" novalidate>
+				<p ng-show="result" id="result-message">{{result}}</p>
+			<div class="form-group">
+				<div class="label">Name</div>
+				<div class="field"><input type="text" name="name" ng-model="enquiry.name" ng-minlength="3" ng-maxlength="30" required/></div>
+				<p ng-show="enquiryForm.name.$error.minlength" class="error-block">Name is too short.</p>
+				<p ng-show="enquiryForm.name.$error.maxlength" class="error-block">Name is too long.</p>
+			</div>
+			<div class="form-group">
+				<div class="label">Email</div>
+				<div class="field"><input type="email" name="email" ng-model="enquiry.email" required/></div>
+				<p ng-show="enquiryForm.email.$error.email" class="error-block">Please enter valid email.</p>
+			</div>
+			<div class="form-group">
+				<div class="label">Mobile</div>
+				<div class="field"><input type="tel" name="mobile" ng-pattern="/^[(]{0,1}[0-9]{3}[)\.\- ]{0,1}[0-9]{3}[\.\- ]{0,1}[0-9]{4}$/" ng-model="enquiry.mobile" required/></div>
+	 			<p ng-show="enquiryForm.mobile.$error.pattern" class="error-block">Please enter valid mobile number.</p>
+			</div>
+			<div class="form-group">
+				<div class="label">Enquiry</div>
+				<div class="field"><textarea name="message" ng-model="enquiry.message" required ng-maxlength="600" /></div>
+	                  <p ng-show="enquiryForm.message.$error.maxlength" class="error-block">Message cannot exceed 600 characters.</p>
+			</div>
+			<button id="submit-btn" ng-disabled="enquiryForm.$invalid">Submit</button>
+		</form>
+	</div>
+	</div>
+</div>

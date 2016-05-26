@@ -51,13 +51,11 @@ public class AuthenticationFilter implements Filter {
             }
         }
         
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:8080");
+        response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE");
         response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Headers", "origin, content-type, accept, authorization");
         response.setHeader("Access-Control-Request-Headers", "Authorization");
-        response.setHeader("auth_token", "new token");
         chain.doFilter(req, res);
     }
 

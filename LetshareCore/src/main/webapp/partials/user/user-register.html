@@ -1,0 +1,101 @@
+<div id="ls-register-user-container" class="row">
+  <div class="col-md-2 centered">
+      <div class="text-center"> Register User </div>
+  </div>
+  <div class="col-md-5 centered ls-block user-register-form">
+    <form ng-submit="registerUser()" name="registerForm" novalidate>
+    <fieldset>  
+      <fieldset class="form-group col-lg-10 centered">
+        <p ng-show="formValid && successMsg" class="success-msg text-center">{{successMsg}}</p>
+        <p ng-show="formValid && errorMsg" class="error-msg text-center margin-b-10">{{errorMsg}}</p>
+      </fieldset>
+    </fieldset>
+    <fieldset>
+      <fieldset class="form-group col-lg-6">
+        <input type="text" 
+               name="firstName"
+               ng-model="user.firstName" 
+               class="form-control"  
+               placeholder="First Name"
+               ng-minlength="3"
+               ng-maxlength="20"
+               required>
+        
+        <p ng-show="!formValid && registerForm.firstName.$error.required" class="error-msg">First Name is required</p>
+        <p ng-show="!formValid && registerForm.firstName.$error.minlength" class="error-msg">First name is too short.</p>
+        <p ng-show="!formValid && registerForm.firstName.$error.maxlength" class="error-msg">First name is too long.</p>
+      </fieldset>
+      
+      <fieldset class="form-group col-lg-6">
+        <input type="text" 
+               name="lastName" 
+               ng-model="user.lastName"  
+               class="form-control"  
+               placeholder="Last Name"
+               ng-minlength="3"
+               ng-maxlength="20"
+               required>
+        <p ng-show="!formValid && registerForm.lastName.$error.required" class="error-msg">Last Name is required</p>
+        <p ng-show="!formValid && registerForm.lastName.$error.minlength" class="error-msg">Last name is too short.</p>
+        <p ng-show="!formValid && registerForm.lastName.$error.maxlength" class="error-msg">Last name is too long.</p>
+      </fieldset>
+    </fieldset>  
+    
+    <fieldset>
+      <fieldset class="form-group col-lg-7">
+        <input type="number" 
+               name="mobile" 
+               ng-model="user.mobile"  
+               class="form-control"
+               placeholder="Mobile"
+               max="9999999999"
+               ng-minlength="10"
+               ng-maxlength="10"
+               required>
+        <p ng-show="!formValid && registerForm.mobile.$error.required" class="error-msg">Mobile is required</p>
+        <p ng-show="!formValid && registerForm.mobile.$error.minlength" class="error-msg">Enter valid mobile number.</p>
+        <p ng-show="!formValid && registerForm.mobile.$error.maxlength" class="error-msg">Enter valid mobile number.</p>
+      </fieldset>
+      <fieldset class="form-group col-lg-5">
+        <label>Mobile number is required for contact purpose</label>
+      </fieldset>
+      
+      <fieldset class="form-group col-lg-7">
+        <input type="email" 
+               name="email" 
+               ng-model="user.email"  
+               class="form-control" 
+               placeholder="Email"
+               required>
+        <p ng-show="!formValid && registerForm.email.$error.required" class="error-msg">Email is required</p>
+        <p ng-show="!formValid && registerForm.email.$error.email" class="error-msg">Enter valid email</p>
+      </fieldset>
+      <fieldset class="form-group col-lg-5">
+        <label>Email is required for forgot password</label>
+      </fieldset>
+    </fieldset>
+    
+    <fieldset>
+      <fieldset class="form-group col-lg-7">
+        <input type="password" 
+               name="password"
+               ng-model="user.password"  
+               class="form-control"  
+               placeholder="Password"
+               ng-minlength="6"
+               ng-maxlength="12"
+               required>
+        <p ng-show="!formValid && registerForm.password.$error.required" class="error-msg">Password is required</p>
+        <p ng-show="!formValid && registerForm.password.$error.minlength" class="error-msg">Password should contains min of 6 characters.</p>
+        <p ng-show="!formValid && registerForm.password.$error.maxlength" class="error-msg">Password should contains max of 12 characters.</p>
+      </fieldset>
+      <fieldset class="form-group col-lg-5">
+        <input type="checkbox"/> <label>I agree <a href="terms.html" target="newtab">terms and conditions</a></label>
+      </fieldset>
+    </fieldset>
+      <fieldset class="form-group col-lg-12 centered">
+        <button class="btn ls-btn" >Register</button>
+      </fieldset>
+    </form>
+  </div>
+</div>

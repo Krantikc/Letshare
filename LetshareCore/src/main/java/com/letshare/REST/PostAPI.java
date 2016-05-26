@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -30,8 +31,6 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -78,45 +77,59 @@ public class PostAPI {
 	
 	@GET
     @Produces("application/json")
-	public Response getAllPosts(@QueryParam("title") String title,
+	public Response getAllPosts(@QueryParam("searchTitle") String title,
+								@QueryParam("categoryId") int categoryId,
+								@QueryParam("cityId") int cityId,
 			                    //@CookieParam("auth_token") String authToken,
 			                    @HeaderParam("Authorization") String token) {
 		
 		
 		
 		Map<String, Object> response = new HashMap<String, Object>();
-		String authToken = token.substring(7);
-		
-		User user = userDao.getUserByToken(authToken);
-		
+		boolean authenticationRequired = false;
 		boolean isValidAccess = false;
-		/*try {
-			isValidAccess = JWTokenUtil.validateToken(token.substring(7), user.getEmail());
-		} catch(ExpiredJwtException e) {
-			String regeneratedToken = JWTokenUtil.generateTokenByEmail(user.getEmail());
-			user.setAuthorizationToken(regeneratedToken);
-			userDao.updateUser(user);
-			response.put("token", regeneratedToken);
-			System.out.println("Regenerated Token");
-		}*/
 		
-		response = userService.validateToken(authToken, user);
-		if (response.get("valid") != null && (Boolean)response.get("valid")) {
-			isValidAccess = true;
-		}
-		
-		
-		if (isValidAccess) {
-			System.out.println(token + " TOKEN ");
-			//try {
-				//List<Post> posts = postService.getAllPosts();
-				List<Post> posts = postService.getAllPosts();
-				response.put("posts", posts);		
-				response.put("success", true);	
+		if (authenticationRequired) {
+			String authToken = token.substring(7);
+			
+			User user = userDao.getUserByToken(authToken);
+			
+			
+			/*try {
+				isValidAccess = JWTokenUtil.validateToken(token.substring(7), user.getEmail());
+			} catch(ExpiredJwtException e) {
+				String regeneratedToken = JWTokenUtil.generateTokenByEmail(user.getEmail());
+				user.setAuthorizationToken(regeneratedToken);
+				userDao.updateUser(user);
+				response.put("token", regeneratedToken);
+				System.out.println("Regenerated Token");
+			}*/
+			
+			response = userService.validateToken(authToken, user);
+			if (response.get("valid") != null && (Boolean)response.get("valid")) {
+				isValidAccess = true;
+			}
+			
+			if (isValidAccess) {
+				System.out.println(token + " TOKEN ");
+				//try {
+					//List<Post> posts = postService.getAllPosts();
+					List<Post> posts = postService.getAllPosts();
+					response.put("posts", posts);		
+					response.put("success", true);	
+			} else {
+				response.put("success", false);	
+				response.put("message", "Invalid user access");		
+			}
 		} else {
-			response.put("success", false);	
-			response.put("message", "Invalid user access");		
+			List<Post> posts = postService.getPosts(title, cityId, categoryId);
+			response.put("posts", posts);		
+			response.put("success", true);	
 		}
+		
+		
+		
+		
 		
         return Response.ok(response).build();
 
@@ -132,6 +145,7 @@ public class PostAPI {
 		Map<String, Object> response = new HashMap<String, Object>();
 		try {
 			Post post = postService.getPost(postId);
+			response.put("success", true);
 			response.put("post", post);
             return Response.ok(response).build();
 
@@ -143,10 +157,11 @@ public class PostAPI {
 	@POST
     //@Produces("application/json")
 	@Consumes("multipart/form-data")
-	public Response addPost(@FormDataParam("title") String title,
+	public Response addPost(@DefaultValue("tit") @FormDataParam("title") String title,
 							@FormDataParam("description") String description,
-							//@FormDataParam("categoryId") int categoryId,
-							//@FormDataParam("userId") int userId,
+							@FormDataParam("categoryId") int categoryId,
+							@FormDataParam("type") String type,
+							@FormDataParam("userId") int userId,
 										   // Location Details
 							@FormDataParam("location1Id") int location1Id,
 							@FormDataParam("city1Id") int city1Id,
@@ -157,7 +172,7 @@ public class PostAPI {
 										   // Post Details
 							@FormDataParam("uniqueId") String uniqueId,
 							//@FormDataParam("color") String color,
-							//@FormDataParam("measurement") String measurement,
+						    @FormDataParam("measurement") String measurement,
 							@FormDataParam("capacity") int capacity,
 							@FormDataParam("availability") int availability,
 							@FormDataParam("amenities") String amenities,
@@ -178,10 +193,11 @@ public class PostAPI {
 		//List<Post> posts = postService.getAllPosts();
 		try {
 			PostLocation postLocation = new PostLocation(location1Id, city1Id, location2Id, city2Id, location3Id, city3Id);
-			PostDetails postDetails = new PostDetails(uniqueId, "", "", capacity, availability, amenities, brand, age);
+			PostDetails postDetails = new PostDetails(uniqueId, "", measurement, capacity, availability, amenities, brand, age);
 					
-			Post post = new Post(title, description, 1, 1, postLocation, postDetails, new Date(), new Date(), true);
+			Post post = new Post(title, description, categoryId, userId, postLocation, postDetails, new Date(), new Date(), true);
 
+			post.setPostType(type);
 			
 			int postId = postService.addPost(post);
 			
@@ -190,9 +206,9 @@ public class PostAPI {
 			if (postId != 0) {
 				String uploadedPath = "";
 				
-				FileUtil.uploadFile(request, uploadedInputStream1,  folderName, fileMetaData1.getFileName());
-				FileUtil.uploadFile(request, uploadedInputStream2,  folderName, fileMetaData2.getFileName());
-				uploadedPath = FileUtil.uploadFile(request, uploadedInputStream3,  folderName, fileMetaData3.getFileName());
+				FileUtil.uploadFile(request, uploadedInputStream1,  folderName, "img-" + postId + "-1.jpg");
+				FileUtil.uploadFile(request, uploadedInputStream2,  folderName, "img-" + postId + "-2.jpg");
+				uploadedPath = FileUtil.uploadFile(request, uploadedInputStream3,  folderName, "img-" + postId + "-3.jpg");
 				response.put("filePath", uploadedPath);	
 			}
 			

@@ -30,4 +30,10 @@ public class PostServiceImpl implements PostService{
 		return postDao.addPost(post);
 	}
 
+	@Override
+	public List<Post> getPosts(String searchTitle, int cityId, int categoryId) {
+		// TODO Auto-generated method stub
+		return postDao.getPosts(searchTitle, cityId, categoryId);
+	}
+
 }

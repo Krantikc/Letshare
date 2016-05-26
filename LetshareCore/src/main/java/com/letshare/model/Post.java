@@ -36,6 +36,9 @@ public class Post {
 	@Column(name="description")
 	private String description;
 	
+	@Column(name="post_type")
+	private String postType;
+	
 	@Column(name="category_id")
 	private int categoryId;
 	
@@ -189,6 +192,14 @@ public class Post {
 
 	public void setPostDetails(PostDetails postDetails) {
 		this.postDetails = postDetails;
+	}
+
+	public String getPostType() {
+		return postType;
+	}
+
+	public void setPostType(String postType) {
+		this.postType = postType;
 	}
 	
 	

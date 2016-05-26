@@ -1,0 +1,63 @@
+<!-- main menu for desktop, tablet and mobile -->
+<div id="ls-main-menu-container"  ng-controller="Menu" resize>
+    <div class="ls-navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#ls-navbar" aria-expanded="false" aria-controls="navbar">
+        </button>
+    </div>
+    <div id="ls-navbar" class="navbar-collapse collapse" aria-expanded="false" navbar>
+        <ul class="ls-main-menu-list nav navbar-nav" >
+            <li class="ls-menu-list-ls">
+                <a ui-sref="home" ui-sref-active="current">{{home}}</a>
+            </li>
+            
+            
+            <li class="ls-menu-list-ls pull-right" ng-if="$root.currentUser">
+              <div class="btn-group account-btn" >
+                <a class="btn dropdown-toggle" data-toggle="dropdown">
+                  {{$root.currentUser.email}}
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li ui-sref="user.settings">
+                    Settings
+                  </li>
+                  <li ui-sref="user.logout">
+                    Logout
+                  </li>
+                </ul>
+              </div>
+              
+            </li>
+            
+            
+            
+            <li class="login-register pull-right" style="margin-right: 10px" ng-if="!$root.currentUser">
+              <a ui-sref="user.register" ui-sref-active="current">{{register}}</a>
+            </li>
+            <li class="login-register pull-right" ng-if="!$root.currentUser">
+              <a>/</a>
+            </li>
+            <li class="login-register pull-right" ng-if="!$root.currentUser">
+              <a ui-sref="login" ui-sref-active="current">{{login}}</a>
+            </li>
+            
+             <li class="pull-right" ui-sref="posts.new" id="post-btn">
+                Submit Free Ad
+             </li>
+             
+            <!--
+            <li class="ls-menu-list-ls pull-right">
+                <a ui-sref="account" ui-sref-active="current">{{$root.currentUser.email}}</a>
+                
+                <ul>
+                  <li>
+                    <a ui-sref="user.logout" ui-sref-active="current">Logout</a>
+                  </li>
+                </ul>
+            </li>
+            -->
+        </ul>
+        <div class="ls-spacer-bar"></div>
+    </div><!--/.nav-collapse -->
+</div>
+

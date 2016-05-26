@@ -161,8 +161,15 @@ public class FileUtil {
 
 			// Creating the directory to store file
 			String realPath = request.getSession().getServletContext().getRealPath("");
-	       
+			System.out.println(realPath);
+			realPath = realPath.substring(0, realPath.lastIndexOf(File.separator));  // 1 folder back (G:\Servers\apache-tomcat-7.0.42\webapps\)
+			//realPath = realPath.substring(0, realPath.lastIndexOf(File.separator));
+			realPath = realPath + File.separator + "ROOT";
+			System.out.println(realPath);
 	        String finalPath = realPath  + File.separator;
+	        
+
+            
 	        
 	        File dir = new File(finalPath + folderName);
 	        if (!dir.exists())
@@ -196,4 +203,14 @@ public class FileUtil {
 	        return finalPath;
 
 	   }
+	public static String getRelativePath(HttpServletRequest request) {
+		String rootPath = "";//request.getServletContext().getRealPath("");
+        rootPath = rootPath.substring(0, rootPath.lastIndexOf(File.separator));
+        rootPath = rootPath.substring(0, rootPath.lastIndexOf(File.separator));
+       
+        String finalPath = rootPath  + File.separator;
+        
+        return finalPath;
+		
+	}
 }

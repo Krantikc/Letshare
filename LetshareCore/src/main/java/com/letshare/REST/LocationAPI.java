@@ -42,13 +42,13 @@ public class LocationAPI {
 	@Path("/{cityId}")
 	public Response getLocationsByCity(@PathParam("cityId") int cityId) {
 		Map<String, Object> response = new HashMap<String, Object>();
-		try {
+		//try {
 			List<Location> locationsList = locationDao.getLocationsByCity(cityId);
 			response.put("locations", locationsList);
             return Response.ok(response).build();
 
-        } catch (Exception e) {
+        /*} catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
-        }      
+        }  */    
 	}
 }

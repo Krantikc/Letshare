@@ -12,5 +12,6 @@ public interface PostDao {
 	public int addPost(Post post);
 	public boolean updatePost(Post post);
 	public List<Post> getPosts();
+	public List<Post> getPosts(String searchTitle, int cityId, int categoryId);
 	public Post getPost(int postId);
 }
