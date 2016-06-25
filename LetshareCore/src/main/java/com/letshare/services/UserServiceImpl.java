@@ -133,13 +133,43 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean updateUser(User user)  throws Exception{
 		
-		return false;
+		return userDao.updateUser(user);
 	}
 
 	@Override
 	public boolean deleteUser(User user)  throws Exception{
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public User getUserById(int userId) throws Exception {
+		return userDao.getUserByUserId(userId);
+	}
+
+	@Override
+	public Map<String, Object> changeUserPassword(int userId, String currentPassword, String newPassword)
+			throws Exception {
+		User user = userDao.getUserByUserId(userId);
+		CryptoUtil cryptoUtil = new CryptoUtil();
+		
+		Map<String, Object> response = new HashMap<>();
+		String encryptedCurrentPassword = cryptoUtil.encrypt(currentPassword);
+		if (encryptedCurrentPassword.equals(user.getPassword())) {
+			String encryptedNewPassword = cryptoUtil.encrypt(newPassword);
+			user.setPassword(encryptedNewPassword);
+			boolean updated = userDao.updateUser(user);
+			if (updated) {
+				response.put("success", true);
+				response.put("msg", "Password changed successfully");
+				
+			}
+		} else {
+			response.put("success", false);
+			response.put("msg", "Invalid Current Password");
+		}
+		
+		return response;
 	}
 
 }

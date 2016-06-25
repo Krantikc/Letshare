@@ -1,5 +1,7 @@
 package com.letshare.dao;
 
+import java.math.BigInteger;
+
 import com.letshare.model.User;
 
 /**
@@ -23,6 +25,6 @@ public interface UserDAO {
 	
 	public User findUserByEmail(String email)  throws Exception;
 	
-	public User findUserByMobile(String mobile)  throws Exception;
+	public User findUserByMobile(BigInteger mobile)  throws Exception;
 	
 }

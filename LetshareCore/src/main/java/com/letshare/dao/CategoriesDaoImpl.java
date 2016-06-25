@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 import com.letshare.model.Category;
@@ -45,6 +46,28 @@ public class CategoriesDaoImpl implements CategoriesDao {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		List<Category> categoriesList = session.createCriteria(Category.class).list();
+		session.getTransaction().commit();
+		session.close();
+		return categoriesList;
+	}
+
+	@Override
+	public List<Category> getCategoriesByLevel(int level) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		List<Category> categoriesList = session.createCriteria(Category.class).
+												add(Restrictions.eq("level", level)).list();
+		session.getTransaction().commit();
+		session.close();
+		return categoriesList;
+	}
+
+	@Override
+	public List<Category> getChildCategories(int categoryId) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		List<Category> categoriesList = session.createCriteria(Category.class).
+												add(Restrictions.eq("parentId", categoryId)).list();
 		session.getTransaction().commit();
 		session.close();
 		return categoriesList;

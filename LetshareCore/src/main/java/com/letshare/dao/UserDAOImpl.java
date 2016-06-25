@@ -1,5 +1,6 @@
 package com.letshare.dao;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -29,8 +30,12 @@ private SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 	}
 	
 	public User getUserByUserId(int userId) {
-		// TODO Auto-generated method stub
-		return null;
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		User user = (User) session.get(User.class, userId);
+		session.getTransaction().commit();
+		session.close();
+		return user;
 	}
 	
 	public int createUser(User user) {
@@ -71,7 +76,7 @@ private SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 	}
 	
 	@Override
-	public User findUserByMobile(String mobile) throws Exception{
+	public User findUserByMobile(BigInteger mobile) throws Exception{
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		User user = (User) session.createCriteria(User.class)

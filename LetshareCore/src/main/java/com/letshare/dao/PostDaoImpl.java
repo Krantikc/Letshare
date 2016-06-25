@@ -1,5 +1,7 @@
 package com.letshare.dao;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -10,6 +12,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.letshare.helper.PostFilter;
 import com.letshare.model.Post;
 import com.letshare.util.HibernateUtil;
 
@@ -106,6 +109,82 @@ public class PostDaoImpl implements PostDao{
 		session.getTransaction().commit();
 		session.close();
 		return post;
+	}
+
+	@Override
+	public List<Post> getPostsByUser(int userId, boolean active) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		List<Post> postsList = session.createCriteria(Post.class).
+								add(Restrictions.eq("userId", userId)).
+								add(Restrictions.eq("active", active)).list();
+		session.getTransaction().commit();
+		session.close();
+		return postsList;
+	}
+
+	@Override
+	public List<Post> getPosts(PostFilter postFilter) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		//Restrictions 
+		Criteria postCrit = session.createCriteria(Post.class, "post");
+
+		postCrit = postCrit.add(Restrictions.eq("post.active", postFilter.isActive()));
+		
+		if (postFilter.getTitle() != null) {
+			postCrit = postCrit.add(Restrictions.like("post.title", "%" + postFilter.getTitle().trim() + "%", MatchMode.ANYWHERE));	
+		}
+		
+		if (postFilter.getPostType() != null && !postFilter.getPostType().equals("")) {
+			System.out.println("post type filter");
+			postCrit = postCrit.add(Restrictions.eq("post.postType", postFilter.getPostType()));
+		}
+		
+		
+		if (postFilter.getCategoryId() != 0) {
+			System.out.println("category filter");
+			postCrit = postCrit.add(Restrictions.eq("post.categoryId", postFilter.getCategoryId()));
+		}
+		
+		postCrit.createAlias("post.postLocation", "postLocation");
+		
+		if (postFilter.getCity1Id() != 0) {
+			System.out.println("city1 filter");
+			postCrit = postCrit.add(Restrictions.eq("postLocation.city1Id", postFilter.getCity1Id()));
+		}
+		
+		if (postFilter.getLocation1Id() != 0) {
+			System.out.println("location1 filter");
+			postCrit = postCrit.add(Restrictions.eq("postLocation.location1Id", postFilter.getLocation1Id()));
+		}
+		
+		if (postFilter.getCity2Id() != 0) {
+			System.out.println("city2 filter");
+			postCrit = postCrit.add(Restrictions.eq("postLocation.city2Id", postFilter.getCity2Id()));
+		}
+		
+		if (postFilter.getLocation2Id() != 0) {
+			System.out.println("location2 filter");
+			postCrit = postCrit.add(Restrictions.eq("postLocation.location2Id", postFilter.getLocation2Id()));
+		}
+		
+		if (postFilter.getProcessDate() != null) {
+			System.out.println("location2 filter");
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			String journeyDtStr = dateFormat.format(postFilter.getProcessDate());
+			postCrit = postCrit.add(Restrictions.eq("post.processDate", postFilter.getProcessDate()));
+		}
+		
+		
+		
+		postCrit.setFirstResult(postFilter.getStart());
+		postCrit.setMaxResults(postFilter.getSize());
+			
+		List<Post> postsList = postCrit.list();
+		session.getTransaction().commit();
+		session.close();
+		return postsList;
 	}
 	
 }

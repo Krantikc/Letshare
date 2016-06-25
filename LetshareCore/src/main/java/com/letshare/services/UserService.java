@@ -16,7 +16,11 @@ public interface UserService {
 	
 	public Map<String, Object> validateUserSession(User user);
 	
+	public User getUserById(int userId)  throws Exception;
+	
 	public Map<String, Object>  addUser(User user)  throws Exception;
+	
+	public Map<String, Object> changeUserPassword(int userId, String currentPassword, String newPassword)  throws Exception;
 	
 	public boolean updateUser(User user)  throws Exception;
 	

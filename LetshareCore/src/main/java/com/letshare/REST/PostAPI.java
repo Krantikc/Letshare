@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.letshare.dao.PostDaoImpl;
 import com.letshare.dao.UserDAO;
+import com.letshare.helper.PostFilter;
 import com.letshare.model.Post;
 import com.letshare.model.PostDetails;
 import com.letshare.model.PostLocation;
@@ -58,7 +62,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 @Component
 public class PostAPI {
 
-	private final String UPLOADED_FILE_PATH = "d:\\";
 	
 	@Autowired
 	PostService postService;
@@ -77,10 +80,16 @@ public class PostAPI {
 	
 	@GET
     @Produces("application/json")
-	public Response getAllPosts(@QueryParam("searchTitle") String title,
-								@QueryParam("categoryId") int categoryId,
-								@QueryParam("cityId") int cityId,
-			                    //@CookieParam("auth_token") String authToken,
+	public Response getAllPosts(@DefaultValue("0") @QueryParam("start") int start, 
+								@DefaultValue("30") @QueryParam("size") int size, 
+								@DefaultValue("") @QueryParam("searchTitle") String title,
+								@DefaultValue("0") @QueryParam("categoryId") int categoryId,
+								@DefaultValue("share") @QueryParam("postType") String postType,
+								@DefaultValue("0") @QueryParam("city1Id") int city1Id,
+								@DefaultValue("0") @QueryParam("location1Id") int location1Id,
+								@DefaultValue("0") @QueryParam("city2Id") int city2Id,
+								@DefaultValue("0") @QueryParam("location2Id") int location2Id,
+								@QueryParam("processDate") String processDateStr,
 			                    @HeaderParam("Authorization") String token) {
 		
 		
@@ -89,6 +98,21 @@ public class PostAPI {
 		boolean authenticationRequired = false;
 		boolean isValidAccess = false;
 		
+		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+		Date processDate = null;
+		try {
+			if (processDateStr != null) {
+				processDate = dateFormat.parse(processDateStr);
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		boolean activePosts = true;
+		
+		PostFilter postFilter = new PostFilter(start, size, activePosts, categoryId, postType, city1Id, city2Id, processDate, location1Id, location2Id, title, token);
 		if (authenticationRequired) {
 			String authToken = token.substring(7);
 			
@@ -122,20 +146,60 @@ public class PostAPI {
 				response.put("message", "Invalid user access");		
 			}
 		} else {
-			List<Post> posts = postService.getPosts(title, cityId, categoryId);
+			List<Post> posts = postService.getPosts(postFilter);
+			System.out.println(city1Id);
+			response.put("posts", posts);		
+			response.put("success", true);	
+		}
+        return Response.ok(response).build();
+
+	}
+	
+	@GET
+    @Produces("application/json")
+	@Path("/user")
+	public Response getPostsByUser(@QueryParam("userId") int userId,
+								   @DefaultValue("true") @QueryParam("active") boolean active, 
+			                       @HeaderParam("Authorization") String token) {
+		
+		Map<String, Object> response = new HashMap<String, Object>();
+		boolean authenticationRequired = true;
+		boolean isValidAccess = false;
+		
+		if (authenticationRequired) {
+			String authToken = token.substring(7);
+			System.out.println(token + " TOKEN ");
+			User user = userDao.getUserByToken(authToken);
+			/*try {
+				isValidAccess = JWTokenUtil.validateToken(token.substring(7), user.getEmail());
+			} catch(ExpiredJwtException e) {
+				String regeneratedToken = JWTokenUtil.generateTokenByEmail(user.getEmail());
+				user.setAuthorizationToken(regeneratedToken);
+				userDao.updateUser(user);
+				response.put("token", regeneratedToken);
+				System.out.println("Regenerated Token");
+			}*/
+			
+			response = userService.validateToken(authToken, user);
+			if (response.get("valid") != null && (Boolean)response.get("valid")) {
+				isValidAccess = true;
+			}
+			
+			if (isValidAccess) {
+					List<Post> posts = postService.getPostsByUser(userId, active);
+					response.put("posts", posts);		
+					response.put("success", true);	
+			} else {
+				response.put("success", false);	
+				response.put("message", "Invalid user access");		
+			}
+		} else {
+			List<Post> posts = postService.getPostsByUser(userId, active);
 			response.put("posts", posts);		
 			response.put("success", true);	
 		}
 		
-		
-		
-		
-		
-        return Response.ok(response).build();
-
-       // } catch (Exception e) {
-           // return Response.status(Response.Status.UNAUTHORIZED).build();
-       // }      
+        return Response.ok(response).build();  
 	}
 	
 	@GET
@@ -162,6 +226,7 @@ public class PostAPI {
 							@FormDataParam("categoryId") int categoryId,
 							@FormDataParam("type") String type,
 							@FormDataParam("userId") int userId,
+							@FormDataParam("processDate") Date processDate,
 										   // Location Details
 							@FormDataParam("location1Id") int location1Id,
 							@FormDataParam("city1Id") int city1Id,
@@ -178,6 +243,7 @@ public class PostAPI {
 							@FormDataParam("amenities") String amenities,
 							@FormDataParam("brand") String brand,
 							@FormDataParam("age") String age,
+							@FormDataParam("displayContactDetails") boolean displayContactDetails,
 						    // Images uploaded
 						    @FormDataParam("uploadedFile1") InputStream uploadedInputStream1,
 						    @FormDataParam("uploadedFile1") FormDataContentDisposition fileMetaData1,
@@ -194,10 +260,14 @@ public class PostAPI {
 		try {
 			PostLocation postLocation = new PostLocation(location1Id, city1Id, location2Id, city2Id, location3Id, city3Id);
 			PostDetails postDetails = new PostDetails(uniqueId, "", measurement, capacity, availability, amenities, brand, age);
-					
-			Post post = new Post(title, description, categoryId, userId, postLocation, postDetails, new Date(), new Date(), true);
+				
+			Date postedDate = new Date();
+			Date modifiedDate = new Date();
+			boolean isPostActive = true;
+			Post post = new Post(title, description, categoryId, userId, postLocation, postDetails, processDate, postedDate, modifiedDate, isPostActive);
 
 			post.setPostType(type);
+			post.setDisplayContactDetails(displayContactDetails);
 			
 			int postId = postService.addPost(post);
 			

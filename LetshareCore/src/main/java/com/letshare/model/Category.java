@@ -8,6 +8,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Category model class, which is persistence object for 'category' table
@@ -16,6 +19,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="category")
+@XmlRootElement
 public class Category {
 	
 	@Id
@@ -35,8 +39,8 @@ public class Category {
 	@Column(name="img")
 	private String image;
 	
-	@Column(name="is_ride")
-	private boolean isRide;
+	@Column(name="is_group")
+	private boolean isCGroup;
 	
 	
 
@@ -90,13 +94,12 @@ public class Category {
 		this.image = image;
 	}
 
-	public boolean isRide() {
-		return isRide;
+	public boolean isCGroup() {
+		return isCGroup;
 	}
 
-	public void setRide(boolean isRide) {
-		this.isRide = isRide;
+	public void setCGroup(boolean isCGroup) {
+		this.isCGroup = isCGroup;
 	}
-	
-	
+
 }

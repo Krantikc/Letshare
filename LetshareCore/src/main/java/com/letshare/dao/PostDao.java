@@ -1,6 +1,8 @@
 package com.letshare.dao;
 
 import java.util.List;
+
+import com.letshare.helper.PostFilter;
 import com.letshare.model.Post;
 
 /**
@@ -13,5 +15,7 @@ public interface PostDao {
 	public boolean updatePost(Post post);
 	public List<Post> getPosts();
 	public List<Post> getPosts(String searchTitle, int cityId, int categoryId);
+	public List<Post> getPosts(PostFilter postFilter);
+	public List<Post> getPostsByUser( int userId, boolean active);
 	public Post getPost(int postId);
 }

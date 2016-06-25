@@ -163,8 +163,9 @@ public class FileUtil {
 			String realPath = request.getSession().getServletContext().getRealPath("");
 			System.out.println(realPath);
 			realPath = realPath.substring(0, realPath.lastIndexOf(File.separator));  // 1 folder back (G:\Servers\apache-tomcat-7.0.42\webapps\)
-			//realPath = realPath.substring(0, realPath.lastIndexOf(File.separator));
-			realPath = realPath + File.separator + "ROOT";
+			realPath = realPath.substring(0, realPath.lastIndexOf(File.separator));
+			//realPath = realPath + File.separator + "ROOT";
+			
 			System.out.println(realPath);
 	        String finalPath = realPath  + File.separator;
 	        

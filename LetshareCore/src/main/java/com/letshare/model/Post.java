@@ -60,6 +60,11 @@ public class Post {
 	@Column(name="active")
 	private boolean active;
 	
+	// To consider journey date for RIDE category
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="process_date")
+	private Date processDate;
+	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="posted_date")
 	private Date postedDate;
@@ -67,7 +72,10 @@ public class Post {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="modified_date")
 	private Date modifiedDate;
-
+	
+	@Column(name="display_contact_details")
+	private boolean displayContactDetails;
+	
 	public Post() {
 		
 	}
@@ -78,6 +86,7 @@ public class Post {
 			   	int userId,
 			   	PostLocation postLocation,
 			   	PostDetails postDetails,
+			   	Date processDate,
 			   	Date postedDate,
 			   	Date modifiedDate,
 			   	boolean active
@@ -88,6 +97,7 @@ public class Post {
 		this.userId = userId;
 		this.postLocation = postLocation;
 		this.postDetails = postDetails;
+		this.processDate = processDate;
 		this.postedDate = postedDate;
 		this.modifiedDate = modifiedDate;
 		this.active = active;
@@ -198,8 +208,24 @@ public class Post {
 		return postType;
 	}
 
+	public Date getProcessDate() {
+		return processDate;
+	}
+
+	public void setProcessDate(Date processDate) {
+		this.processDate = processDate;
+	}
+
 	public void setPostType(String postType) {
 		this.postType = postType;
+	}
+
+	public boolean isDisplayContactDetails() {
+		return displayContactDetails;
+	}
+
+	public void setDisplayContactDetails(boolean displayContactDetails) {
+		this.displayContactDetails = displayContactDetails;
 	}
 	
 	

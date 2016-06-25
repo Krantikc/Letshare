@@ -1,6 +1,7 @@
 package com.letshare.model;
 
 
+import java.math.BigInteger;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -43,7 +44,7 @@ public class User {
 	private String email2;
 	
 	@Column(name="mobile")
-	private String mobile;
+	private BigInteger mobile;
 	
 	@Column(name="gender")
 	private String gender;
@@ -152,11 +153,12 @@ public class User {
 		this.email2 = email2;
 	}
 
-	public String getMobile() {
+
+	public BigInteger getMobile() {
 		return mobile;
 	}
 
-	public void setMobile(String mobile) {
+	public void setMobile(BigInteger mobile) {
 		this.mobile = mobile;
 	}
 
