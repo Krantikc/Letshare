@@ -45,6 +45,7 @@ public class Post {
 	@Column(name="post_location_id")
 	private int postLocationId;
 	
+	
 	@OneToOne(cascade = CascadeType.ALL)
 	private PostLocation postLocation;
 	

@@ -4,13 +4,16 @@ package com.letshare.model;
 import java.math.BigInteger;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
@@ -37,6 +40,7 @@ public class User {
 	@Column(name="email")
 	private String email;
 	
+	@JsonIgnore
 	@Column(name="password")
 	private String password;
 	
@@ -70,11 +74,23 @@ public class User {
 	@Column(name="token_issued_at")
 	private Date tokenIssuedAt;
 	
+	@OneToOne(cascade=CascadeType.ALL)
+	private UserAddress userAddress;
+	
+	
 	// setters and getters
 
 
 	public int getUserId() {
 		return userId;
+	}
+
+	public UserAddress getUserAddress() {
+		return userAddress;
+	}
+
+	public void setUserAddress(UserAddress userAddress) {
+		this.userAddress = userAddress;
 	}
 
 	public Date getTokenIssuedAt() {
