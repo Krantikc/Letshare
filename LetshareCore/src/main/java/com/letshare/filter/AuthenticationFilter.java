@@ -33,9 +33,12 @@ public class AuthenticationFilter implements Filter {
         	isPreflightReq = true;
         }
         final String authHeader = request.getHeader("Authorization");
-        if (!isPreflightReq && !authHeader.equals(ALLOWABLE_REQUEST_KEY)) {
-        	if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            	throw new ServletException("Missing or invalid Authorization header.");
+        
+        
+        if (!isPreflightReq && (authHeader !=null && !authHeader.equals(ALLOWABLE_REQUEST_KEY))) {
+        	
+        	if (!authHeader.startsWith("Bearer ")) {
+            	throw new ServletException("Invalid Authorization header.");
             }
             
             final String token = authHeader.substring(7);

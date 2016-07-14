@@ -35,7 +35,6 @@ public class CityAPI {
 	public Response getAllLocations() {
 		Map<String, Object> response = new HashMap<String, Object>();
 		List<City> citiesList = cityDao.getCities();
-		System.out.println(citiesList);
 		response.put("cities", citiesList);
         return Response.ok(response).build();
 	}

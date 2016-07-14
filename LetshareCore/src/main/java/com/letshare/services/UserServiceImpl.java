@@ -13,7 +13,9 @@ import com.letshare.model.User;
 import com.letshare.util.CryptoUtil;
 import com.letshare.util.EncryptionService;
 import com.letshare.util.JWTokenUtil;
+import com.letshare.util.MailUtil;
 import com.letshare.util.Messages;
+import com.letshare.util.MiscUtil;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -168,6 +170,41 @@ public class UserServiceImpl implements UserService {
 			response.put("success", false);
 			response.put("msg", "Invalid Current Password");
 		}
+		
+		return response;
+	}
+
+	@Override
+	public Map<String, Object> resetPassword(String email) throws Exception {
+		CryptoUtil cryptoUtil = new CryptoUtil();
+		
+		User user = userDao.findUserByEmail(email);
+		Map<String, Object> response = new HashMap<>();
+		
+		response.put("success", false);
+		if (user != null) {
+			String password = MiscUtil.generatePassword(6);
+			String encryptedCurrentPassword = cryptoUtil.encrypt(password);
+			user.setPassword(encryptedCurrentPassword);
+			boolean isUpdated = userDao.updateUser(user);
+			System.out.println(password);
+			if (isUpdated) {
+				String bodyMsg = "Your password has been reset to : " + password;
+				MailUtil.sendMail("letshare", 
+								  user.getEmail(), 
+								  "Password Reset", 
+								  "Dear " + user.getFirstName() + " " + user.getLastName() + ", ", 
+								  bodyMsg);
+				
+				response.put("success", true);
+				response.put("msg", "Password has been reset successfully and sent to registered email");
+			}
+		} else {
+
+			response.put("success", false);
+			response.put("msg", "User doesn't exist");
+		}
+		
 		
 		return response;
 	}

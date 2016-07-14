@@ -25,4 +25,6 @@ public interface UserService {
 	public boolean updateUser(User user)  throws Exception;
 	
 	public boolean deleteUser(User user)  throws Exception;
+	
+	public Map<String, Object> resetPassword(String email)  throws Exception;
 }

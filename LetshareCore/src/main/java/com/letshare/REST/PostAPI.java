@@ -95,61 +95,61 @@ public class PostAPI {
 		
 		
 		Map<String, Object> response = new HashMap<String, Object>();
-		boolean authenticationRequired = false;
-		boolean isValidAccess = false;
 		
-		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-		Date processDate = null;
 		try {
+			boolean authenticationRequired = false;
+			boolean isValidAccess = false;
+			
+			DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+			Date processDate = null;
+			
 			if (processDateStr != null) {
 				processDate = dateFormat.parse(processDateStr);
 			}
 			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		boolean activePosts = true;
-		
-		PostFilter postFilter = new PostFilter(start, size, activePosts, categoryId, postType, city1Id, city2Id, processDate, location1Id, location2Id, title, token);
-		if (authenticationRequired) {
-			String authToken = token.substring(7);
+			boolean activePosts = true;
 			
-			User user = userDao.getUserByToken(authToken);
-			
-			
-			/*try {
-				isValidAccess = JWTokenUtil.validateToken(token.substring(7), user.getEmail());
-			} catch(ExpiredJwtException e) {
-				String regeneratedToken = JWTokenUtil.generateTokenByEmail(user.getEmail());
-				user.setAuthorizationToken(regeneratedToken);
-				userDao.updateUser(user);
-				response.put("token", regeneratedToken);
-				System.out.println("Regenerated Token");
-			}*/
-			
-			response = userService.validateToken(authToken, user);
-			if (response.get("valid") != null && (Boolean)response.get("valid")) {
-				isValidAccess = true;
-			}
-			
-			if (isValidAccess) {
-				System.out.println(token + " TOKEN ");
-				//try {
-					//List<Post> posts = postService.getAllPosts();
-					List<Post> posts = postService.getAllPosts();
-					response.put("posts", posts);		
-					response.put("success", true);	
+			PostFilter postFilter = new PostFilter(start, size, activePosts, categoryId, postType, city1Id, city2Id, processDate, location1Id, location2Id, title, token);
+			if (authenticationRequired) {
+				String authToken = token.substring(7);
+				
+				User user = userDao.getUserByToken(authToken);
+				
+				
+				/*try {
+					isValidAccess = JWTokenUtil.validateToken(token.substring(7), user.getEmail());
+				} catch(ExpiredJwtException e) {
+					String regeneratedToken = JWTokenUtil.generateTokenByEmail(user.getEmail());
+					user.setAuthorizationToken(regeneratedToken);
+					userDao.updateUser(user);
+					response.put("token", regeneratedToken);
+					System.out.println("Regenerated Token");
+				}*/
+				
+				response = userService.validateToken(authToken, user);
+				if (response.get("valid") != null && (Boolean)response.get("valid")) {
+					isValidAccess = true;
+				}
+				
+				if (isValidAccess) {
+					System.out.println(token + " TOKEN ");
+						List<Post> posts = postService.getAllPosts();
+						response.put("posts", posts);		
+						response.put("success", true);	
+				} else {
+					response.put("success", false);	
+					response.put("message", "Invalid user access");		
+				}
 			} else {
-				response.put("success", false);	
-				response.put("message", "Invalid user access");		
+				List<Post> posts = postService.getPosts(postFilter);
+				response.put("posts", posts);		
+				response.put("success", true);	
 			}
-		} else {
-			List<Post> posts = postService.getPosts(postFilter);
-			System.out.println(city1Id);
-			response.put("posts", posts);		
-			response.put("success", true);	
+		} catch (Exception e) {
+			response.put("success", false);
+			response.put("exception", e.getClass());
+			response.put("message", e.getMessage());
+			e.printStackTrace();
 		}
         return Response.ok(response).build();
 
@@ -163,40 +163,47 @@ public class PostAPI {
 			                       @HeaderParam("Authorization") String token) {
 		
 		Map<String, Object> response = new HashMap<String, Object>();
-		boolean authenticationRequired = true;
-		boolean isValidAccess = false;
-		
-		if (authenticationRequired) {
-			String authToken = token.substring(7);
-			System.out.println(token + " TOKEN ");
-			User user = userDao.getUserByToken(authToken);
-			/*try {
-				isValidAccess = JWTokenUtil.validateToken(token.substring(7), user.getEmail());
-			} catch(ExpiredJwtException e) {
-				String regeneratedToken = JWTokenUtil.generateTokenByEmail(user.getEmail());
-				user.setAuthorizationToken(regeneratedToken);
-				userDao.updateUser(user);
-				response.put("token", regeneratedToken);
-				System.out.println("Regenerated Token");
-			}*/
+		try {
+			boolean authenticationRequired = true;
+			boolean isValidAccess = false;
 			
-			response = userService.validateToken(authToken, user);
-			if (response.get("valid") != null && (Boolean)response.get("valid")) {
-				isValidAccess = true;
-			}
-			
-			if (isValidAccess) {
-					List<Post> posts = postService.getPostsByUser(userId, active);
-					response.put("posts", posts);		
-					response.put("success", true);	
+			if (authenticationRequired) {
+				String authToken = token.substring(7);
+				System.out.println(token + " TOKEN ");
+				User user = userDao.getUserByToken(authToken);
+				/*try {
+					isValidAccess = JWTokenUtil.validateToken(token.substring(7), user.getEmail());
+				} catch(ExpiredJwtException e) {
+					String regeneratedToken = JWTokenUtil.generateTokenByEmail(user.getEmail());
+					user.setAuthorizationToken(regeneratedToken);
+					userDao.updateUser(user);
+					response.put("token", regeneratedToken);
+					System.out.println("Regenerated Token");
+				}*/
+				
+				response = userService.validateToken(authToken, user);
+				if (response.get("valid") != null && (Boolean)response.get("valid")) {
+					isValidAccess = true;
+				}
+				
+				if (isValidAccess) {
+						List<Post> posts = postService.getPostsByUser(userId, active);
+						response.put("posts", posts);		
+						response.put("success", true);	
+				} else {
+					response.put("success", false);	
+					response.put("message", "Invalid user access");		
+				}
 			} else {
-				response.put("success", false);	
-				response.put("message", "Invalid user access");		
+				List<Post> posts = postService.getPostsByUser(userId, active);
+				response.put("posts", posts);		
+				response.put("success", true);	
 			}
-		} else {
-			List<Post> posts = postService.getPostsByUser(userId, active);
-			response.put("posts", posts);		
-			response.put("success", true);	
+		} catch (Exception e) {
+			response.put("success", false);
+			response.put("exception", e.getClass());
+			response.put("message", e.getMessage());
+			e.printStackTrace();
 		}
 		
         return Response.ok(response).build();  
@@ -211,17 +218,21 @@ public class PostAPI {
 			Post post = postService.getPost(postId);
 			response.put("success", true);
 			response.put("post", post);
-            return Response.ok(response).build();
+            
 
         } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+        	response.put("success", false);
+			response.put("exception", e.getClass());
+			response.put("message", e.getMessage());
+			e.printStackTrace();
         }      
+		return Response.ok(response).build();
 	}
 	
 	@POST
     //@Produces("application/json")
 	@Consumes("multipart/form-data")
-	public Response addPost(@DefaultValue("tit") @FormDataParam("title") String title,
+	public Response addPost(@DefaultValue("") @FormDataParam("title") String title,
 							@FormDataParam("description") String description,
 							@FormDataParam("categoryId") int categoryId,
 							@FormDataParam("type") String type,
@@ -276,20 +287,34 @@ public class PostAPI {
 			if (postId != 0) {
 				String uploadedPath = "";
 				
-				FileUtil.uploadFile(request, uploadedInputStream1,  folderName, "img-" + postId + "-1.jpg");
-				FileUtil.uploadFile(request, uploadedInputStream2,  folderName, "img-" + postId + "-2.jpg");
-				uploadedPath = FileUtil.uploadFile(request, uploadedInputStream3,  folderName, "img-" + postId + "-3.jpg");
+				if (uploadedInputStream1 != null) {
+					FileUtil.uploadFile(request, uploadedInputStream1,  folderName, "img-" + postId + "-1.jpg");
+				}
+				
+				if (uploadedInputStream2 != null) {
+					FileUtil.uploadFile(request, uploadedInputStream2,  folderName, "img-" + postId + "-2.jpg");
+				}
+				
+				if (uploadedInputStream3 != null) {
+					uploadedPath = FileUtil.uploadFile(request, uploadedInputStream3,  folderName, "img-" + postId + "-3.jpg");
+				}
 				response.put("filePath", uploadedPath);	
 			}
 			
 			
 			
 			response.put("success", true);			
-            return Response.ok(response).build();
+           
 
         } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        }     
+        	response.put("success", false);
+			response.put("exception", e.getClass());
+			response.put("message", e.getMessage());
+			e.printStackTrace();
+            
+        }   
+		
+		 return Response.ok(response).build();
 		
 	}
 	
